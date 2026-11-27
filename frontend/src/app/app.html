@@ -1,0 +1,56 @@
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="FlowOps home"><span class="brand-mark">F<span>✦</span></span><span>flowops<small>WORKSPACE</small></span></a>
+    <div class="side-label">WORKSPACE</div>
+    <div class="nav-active"><span class="nav-icon">▦</span> Overview <span class="active-dot"></span></div>
+    <div class="side-label side-label-lower">YOUR STACK</div>
+    <div class="stack-item"><span class="stack-icon">◈</span><span>Spring Boot<small>REST API</small></span></div>
+    <div class="stack-item"><span class="stack-icon">◇</span><span>Kubernetes<small>Orchestration</small></span></div>
+    <div class="stack-item"><span class="stack-icon">↻</span><span>Argo CD<small>GitOps delivery</small></span></div>
+    <div class="sidebar-bottom"><span class="small-dot"></span><span>Built for better flow<small>A DevSecOps demo</small></span></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Overview</strong></div><span class="top-tag"><span class="small-dot"></span> LOCAL WORKSPACE</span></header>
+    <div class="content">
+      @if (!authenticated()) {
+        <div class="login-layout">
+          <div class="intro"><div class="eyebrow"><span></span> YOUR WORK, IN FLOW</div><h1>A little clarity<br>goes a <em>long way.</em></h1><p>One calm place for your tasks, backed by a secure API and a GitOps-ready deployment.</p><div class="intro-note"><span>✳</span><div>Made for focused work<small>Less noise. More progress.</small></div></div></div>
+          <section class="login-card"><div class="card-icon">↗</div><p class="overline">WELCOME BACK</p><h2>Sign in to FlowOps</h2><p class="muted">Enter the credentials configured for your workspace.</p>
+            <form (ngSubmit)="login()"><label for="username">Username</label><input id="username" name="username" [(ngModel)]="username" autocomplete="username" placeholder="Your username" required>
+              <label for="password">Password</label><input id="password" type="password" name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="Your password" required>
+              @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+              <button class="primary full" type="submit" [disabled]="busy()">{{ busy() ? 'Connecting…' : 'Continue to workspace' }} <span>→</span></button>
+            </form><p class="secure-note">◈ &nbsp; Local demo · credentials stay in this session</p>
+          </section>
+        </div>
+      } @else {
+        <section class="heading"><div><p class="eyebrow"><span></span> YOUR WORKSPACE</p><h1>Let's make progress<span class="period">.</span></h1><p>Welcome back, {{ username }}. Here's what needs your attention.</p></div><button class="secondary" (click)="logout()">Sign out <span>↗</span></button></section>
+        @if (error()) { <div class="banner error" role="alert">{{ error() }}</div> }
+        @if (notice()) { <div class="banner success" role="status">{{ notice() }} <button (click)="notice.set('')" aria-label="Dismiss notification">×</button></div> }
+        <section class="stats" aria-label="Task statistics">
+          <div class="stat"><div class="stat-top">ALL TASKS <span>◈</span></div><div class="stat-number">{{ tasks().length }}</div><div class="stat-caption">Everything on your list</div></div>
+          <div class="stat"><div class="stat-top">TO DO <span class="amber">◔</span></div><div class="stat-number">{{ pending() }}</div><div class="stat-caption">Ready for your focus</div></div>
+          <div class="stat"><div class="stat-top">COMPLETED <span class="mint">✓</span></div><div class="stat-number">{{ completed() }}</div><div class="stat-caption">Small wins add up</div></div>
+        </section>
+        <div class="dashboard">
+          <section class="panel tasks-panel"><div class="panel-head"><div><p class="overline">YOUR PRIORITIES</p><h2>Tasks <span class="count">{{ tasks().length }}</span></h2><p class="muted">A little progress every day.</p></div><button class="icon-button" aria-label="Refresh tasks and version" (click)="refresh()">↻</button></div>
+            <form class="add-row" (ngSubmit)="add()"><span>＋</span><input name="draft" [(ngModel)]="draft" maxlength="120" placeholder="Add something to your list…" aria-label="New task"><button class="primary" type="submit" [disabled]="busy()">Add task <span>↗</span></button></form>
+            <div class="filters" aria-label="Task filter"><button [class.selected]="filter() === 'all'" (click)="filter.set('all')">All tasks <span>{{ tasks().length }}</span></button><button [class.selected]="filter() === 'open'" (click)="filter.set('open')">To do <span>{{ pending() }}</span></button><button [class.selected]="filter() === 'done'" (click)="filter.set('done')">Completed <span>{{ completed() }}</span></button></div>
+            <div class="task-list">
+              @for (task of filtered(); track task.id) {
+                <div class="task-row"><button class="check" [class.checked]="task.completed" [disabled]="busy()" (click)="save(task, task.title, !task.completed)" [attr.aria-label]="task.completed ? 'Mark task incomplete' : 'Mark task complete'">{{ task.completed ? '✓' : '' }}</button>
+                  @if (editId === task.id) { <form class="edit-form" (ngSubmit)="save(task, editTitle, task.completed)"><input name="editTitle" [(ngModel)]="editTitle" maxlength="120" aria-label="Edit task title"><button type="submit" [disabled]="busy()">Save</button><button type="button" (click)="editId = ''">Cancel</button></form> }
+                  @else { <span class="task-title" [class.done]="task.completed">{{ task.title }}</span><div class="task-actions"><button (click)="startEdit(task)" [disabled]="busy()">Edit</button><button (click)="remove(task)" [disabled]="busy()" [attr.aria-label]="'Delete ' + task.title">Delete</button></div> }
+                </div>
+              } @empty { <div class="empty"><div class="empty-icon">✳</div><strong>Nothing here yet</strong><p>{{ tasks().length ? 'Try a different filter.' : 'Add your first task and get the ball rolling.' }}</p></div> }
+            </div>
+          </section>
+          <div class="right-column"><section class="panel deployment"><div class="panel-head"><div><p class="overline">BEHIND THE SCENES</p><h2>Deployment</h2></div><span class="deploy-icon">↗</span></div><div class="deployment-label"><span class="small-dot"></span> API MESSAGE</div><div class="version">{{ info()?.message }}</div><p>This message comes from the running API configuration. Refresh after an Argo CD sync to see changes.</p><div class="deploy-footer"><span>MANAGED WITH</span><strong>◈ &nbsp; GitOps</strong></div></section>
+            <div class="note-card"><div class="note-icon">✳</div><strong>Keep the momentum.</strong><p>Big things happen one task at a time.</p></div><p class="data-note">Tasks are stored in memory and reset when the API restarts.</p>
+          </div>
+        </div>
+      }
+      <footer>FLOWOPS <span>✦</span> &nbsp; A little more done, every day. <span class="footer-right">BUILT FOR THE JOURNEY</span></footer>
+    </div>
+  </main>
+</div>
