@@ -24,6 +24,8 @@ describe('FlowOps', () => {
     const password = el.querySelector<HTMLInputElement>('#password')!;
     username.value = 'demo'; username.dispatchEvent(new Event('input'));
     password.value = 'test'; password.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+    fixture.detectChanges();
     el.querySelector('form')!.dispatchEvent(new Event('submit'));
     const http = TestBed.inject(HttpTestingController);
     const info = http.expectOne('/backend/');
