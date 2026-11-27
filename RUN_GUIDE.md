@@ -15,7 +15,7 @@ In PowerShell check `java -version`, `mvn -v`, `git --version`, `docker version`
 
 ## 1. Open and build
 
-Extract the ZIP, open its gitops-spring-demo folder in VS Code, then open a PowerShell terminal in that folder.
+Clone the published repository with `git clone https://github.com/ayoub279/gitops-spring-demo.git`, open its gitops-spring-demo folder in VS Code, then open a PowerShell terminal in that folder. Alternatively extract the ZIP, but clone it to follow the Git steps below.
 
 ```powershell
 mvn -B clean verify
@@ -41,21 +41,11 @@ In a second terminal use `curl.exe http://localhost:8080/actuator/health` (expec
 
 To use the local Angular development server, keep the API running. From the frontend folder run `npm start` and open http://localhost:4200. Sign in with the lab credentials. The development proxy sends /backend/ to the API on port 8080. Stop both processes with Ctrl+C before using the later port-forwards.
 
-## 2. Put the project in Git
+## 2. Check the Git repository
 
-Create a new EMPTY GitHub repository named gitops-spring-demo; do not add README or license during creation. For the simplest lab make it public; never commit credentials. Private repositories need Argo repository credentials and may require an eligible GitHub security plan for CodeQL.
+The repository is already public at https://github.com/ayoub279/gitops-spring-demo. If you cloned it, its origin and Argo CD repository URL are configured already. Run `git status` and `git remote -v` to check. Later changes can be committed and pushed to main. If you use your own copy or a fork, update `argocd/application.yaml` to point to your repository.
 
-In argocd/application.yaml replace REPLACE_ME with your GitHub username. Then replace YOUR_USERNAME in the remote URL below:
-
-```powershell
-git init -b main
-git add .
-git commit -m "Initial secure GitOps task API"
-git remote add origin https://github.com/YOUR_USERNAME/gitops-spring-demo.git
-git push -u origin main
-```
-
-If asked, set Git username/email and authenticate with GitHub. Confirm the files and Actions runs in GitHub. Investigate any failed checks rather than claiming success.
+GitHub Actions is configured for builds and scans; check the Actions tab for actual results. Investigate any failures rather than claiming success.
 
 ## 3. Cluster, image and Secret
 
